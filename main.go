@@ -31,10 +31,15 @@ func main() {
 		asyncapi_url = "http://localhost:8000/static/asyncapi.yml"
 	}
 
+	asyncapi_ui_url := os.Getenv("ASYNCAPI_UI_URL")
+	if asyncapi_ui_url == "" {
+		asyncapi_ui_url = "/asyncapi-ui"
+	}
+
 	e.Static("/static", ".")
 
 	// Named route "foobar"
-	e.GET("/asyncapi-ui", func(c echo.Context) error {
+	e.GET(asyncapi_ui_url, func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 			"url": asyncapi_url,
 		})
