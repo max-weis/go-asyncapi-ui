@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"io"
 	"net/http"
-	"os"
 )
 
 // TemplateRenderer is a custom html/template renderer for Echo framework
@@ -20,28 +19,16 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 
 func main() {
 	e := echo.New()
+	e.Static("/", ".")
 
 	renderer := &TemplateRenderer{
 		templates: template.Must(template.ParseGlob("*.html")),
 	}
 	e.Renderer = renderer
 
-	asyncapi_url := os.Getenv("ASYNCAPI_URL")
-	if asyncapi_url == "" {
-		asyncapi_url = "http://localhost:8000/static/asyncapi.yml"
-	}
-
-	asyncapi_ui_url := os.Getenv("ASYNCAPI_UI_URL")
-	if asyncapi_ui_url == "" {
-		asyncapi_ui_url = "/asyncapi-ui"
-	}
-
-	e.Static("/static", ".")
-
-	// Named route "foobar"
-	e.GET(asyncapi_ui_url, func(c echo.Context) error {
+	e.GET("/asyncapi-ui", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-			"url": asyncapi_url,
+			"url": "http://localhost:8000/asyncapi.yml",
 		})
 	})
 
